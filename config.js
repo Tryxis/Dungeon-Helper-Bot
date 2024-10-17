@@ -1,0 +1,6 @@
+{
+    "token": "INSERT TOKEN FROM YOUR APP",
+    "serverId": "INSERT ID OF THE SERVER YOU WISH TO USE IT ON",
+    "clientId": "INSERT CLIENT ID FROM YOUR APP"
+    
+}
