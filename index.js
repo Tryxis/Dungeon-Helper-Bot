@@ -1,7 +1,9 @@
 const {Client, Events, GatewayIntentBits, SlashCommandBuilder } = require("discord.js");
+const fs = require('fs');
 const {token, serverId} = require("./config.json");
 const { responses } = require("./roll-commands.js");
 const { conditions, rules } = require("./rules.js");
+const { commands } = require("./commands.js");
 
 
 const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]});
@@ -54,6 +56,17 @@ client.once(Events.ClientReady, c => {
     client.application.commands.create(rulesCommand, serverId);
 
 });
+
+// Function to read the spells.json file
+const getSpellsData = () => {
+    try {
+        const data = fs.readFileSync('spells.json', 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        console.error('Error reading spells.json file:', err);
+        return null;
+    }
+};
 
 
 // Functions --------------------------------------
@@ -157,6 +170,46 @@ client.on(Events.InteractionCreate, async (interaction) => {
             await interaction.reply(`${selectedRule.name}: ${selectedRule.description}`);
         } else {
             await interaction.reply("Rule not found.");
+        }
+    }
+});
+
+// Spell lookup function for the 'spells' command
+client.on(Events.InteractionCreate, async (interaction) => {
+    if (!interaction.isCommand()) return;
+
+    const { commandName, options } = interaction;
+
+    if (commandName === 'spell') {
+        const spellName = options.getString('spell');
+        console.log(`Spell selected: ${spellName}`); // Log the selected spell name
+
+        const spellsData = getSpellsData(); // Load the spells data from the file
+        if (!spellsData) {
+            await interaction.reply("Error loading spells data.");
+            return;
+        }
+
+        // Find the spell based on the name
+        const selectedSpell = spellsData.find(spell => spell.name.toLowerCase() === spellName.toLowerCase());
+
+        if (selectedSpell) {
+            const { name, level, school, casting_time, range, duration, description, components } = selectedSpell;
+            const componentsText = `Components: ${components.raw}`;
+            
+            // Reply with the spell details
+            await interaction.reply(`
+**${name}**
+*Level*: ${level}, *School*: ${school}
+*Casting Time*: ${casting_time}, *Range*: ${range}
+*Duration*: ${duration}
+
+**Description**: ${description}
+
+${componentsText}
+            `);
+        } else {
+            await interaction.reply("Spell not found.");
         }
     }
 });
