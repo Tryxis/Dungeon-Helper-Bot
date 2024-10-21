@@ -1,12 +1,12 @@
-const {Client, Events, GatewayIntentBits, SlashCommandBuilder } = require("discord.js");
+const { Client, Events, GatewayIntentBits, SlashCommandBuilder } = require("discord.js");
 const fs = require('fs');
-const {token, serverId} = require("./config.json");
+const { token, serverId } = require("./config.json");
 const { responses } = require("./roll-commands.js");
 const { conditions, rules } = require("./rules.js");
 const { commands } = require("./commands.js");
 
 
-const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]});
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 
 // Slash Builders
 client.once(Events.ClientReady, c => {
@@ -15,11 +15,11 @@ client.once(Events.ClientReady, c => {
     const ping = new SlashCommandBuilder()
         .setName(`ping`)
         .setDescription(`Replies with "Pong"`);
-    
-        const conditionCommand = new SlashCommandBuilder()
+
+    const conditionCommand = new SlashCommandBuilder()
         .setName('condition')
         .setDescription('Get details about a specific D&D condition')
-        .addStringOption(option => 
+        .addStringOption(option =>
             option.setName('condition')
                 .setDescription('Select a condition')
                 .setRequired(true)
@@ -40,20 +40,29 @@ client.once(Events.ClientReady, c => {
                     { name: 'Unconscious', value: 'Unconscious' },
                 ));
 
-                const rulesCommand = new SlashCommandBuilder()
-                .setName('rules')
-                .setDescription('Get rules reminders')
-                .addStringOption(option => 
-                    option.setName('rules')
-                        .setDescription('Select a rule')
-                        .setRequired(true)
-                        .addChoices(
-                            { name: 'Sneak Attack', value: 'Sneak Attack' },
-                        ));
+    const rulesCommand = new SlashCommandBuilder()
+        .setName('rules')
+        .setDescription('Get rules reminders')
+        .addStringOption(option =>
+            option.setName('rules')
+                .setDescription('Select a rule')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'Sneak Attack', value: 'Sneak Attack' },
+                ));
+
+    const spellCommand = new SlashCommandBuilder()
+        .setName('spell')
+        .setDescription('Get details about a specific spell')
+        .addStringOption(option =>
+            option.setName('spell')
+                .setDescription('The name of the spell')
+                .setRequired(true));
 
     client.application.commands.create(ping, serverId);
     client.application.commands.create(conditionCommand, serverId);
     client.application.commands.create(rulesCommand, serverId);
+    client.application.commands.create(spellCommand, serverId);
 
 });
 
@@ -73,8 +82,8 @@ const getSpellsData = () => {
 
 // Ping function-----------------------------------
 client.on(Events.InteractionCreate, interaction => {
-    if(!interaction.isChatInputCommand()) return;
-    if(interaction.commandName === "ping") {
+    if (!interaction.isChatInputCommand()) return;
+    if (interaction.commandName === "ping") {
         interaction.reply("Pong!")
     }
 });
@@ -141,7 +150,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (commandName === 'condition') {
         const conditionName = options.getString('condition');
         console.log(`Condition selected: ${conditionName}`); // Log the selected condition
-        
+
         const selectedCondition = conditions.options.find(c => c.name === conditionName);
         console.log(`Selected Condition Object: ${JSON.stringify(selectedCondition)}`); // Log the found condition
 
@@ -162,7 +171,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (commandName === 'rules') {
         const ruleName = options.getString('rules');
         console.log(`Condition selected: ${ruleName}`); // Log the selected condition
-        
+
         const selectedRule = rules.options.find(c => c.name === ruleName);
         console.log(`Selected Rules Object: ${JSON.stringify(selectedRule)}`); // Log the found condition
 
@@ -196,7 +205,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (selectedSpell) {
             const { name, level, school, casting_time, range, duration, description, components } = selectedSpell;
             const componentsText = `Components: ${components.raw}`;
-            
+
             // Reply with the spell details
             await interaction.reply(`
 **${name}**
