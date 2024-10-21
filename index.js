@@ -1,12 +1,12 @@
 const {Client, Events, GatewayIntentBits, SlashCommandBuilder } = require("discord.js");
 const {token, serverId} = require("./config.json");
 const { responses } = require("./roll-commands.js");
-const { conditions } = require("./rules.js");
+const { conditions, rules } = require("./rules.js");
 
 
 const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]});
 
-
+// Slash Builders
 client.once(Events.ClientReady, c => {
     console.log(`Logged in as ${c.user.tag}`);
 
@@ -38,12 +38,22 @@ client.once(Events.ClientReady, c => {
                     { name: 'Unconscious', value: 'Unconscious' },
                 ));
 
+                const rulesCommand = new SlashCommandBuilder()
+                .setName('rules')
+                .setDescription('Get rules reminders')
+                .addStringOption(option => 
+                    option.setName('rules')
+                        .setDescription('Select a rule')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'Sneak Attack', value: 'Sneak Attack' },
+                        ));
+
     client.application.commands.create(ping, serverId);
     client.application.commands.create(conditionCommand, serverId);
+    client.application.commands.create(rulesCommand, serverId);
 
 });
-
-
 
 
 // Functions --------------------------------------
@@ -126,6 +136,27 @@ client.on(Events.InteractionCreate, async (interaction) => {
             await interaction.reply(`${selectedCondition.name}: ${selectedCondition.description}`);
         } else {
             await interaction.reply("Condition not found.");
+        }
+    }
+});
+
+// Rules function -----------------------------------
+client.on(Events.InteractionCreate, async (interaction) => {
+    if (!interaction.isCommand()) return;
+
+    const { commandName, options } = interaction;
+
+    if (commandName === 'rules') {
+        const ruleName = options.getString('rules');
+        console.log(`Condition selected: ${ruleName}`); // Log the selected condition
+        
+        const selectedRule = rules.options.find(c => c.name === ruleName);
+        console.log(`Selected Rules Object: ${JSON.stringify(selectedRule)}`); // Log the found condition
+
+        if (selectedRule) {
+            await interaction.reply(`${selectedRule.name}: ${selectedRule.description}`);
+        } else {
+            await interaction.reply("Rule not found.");
         }
     }
 });
