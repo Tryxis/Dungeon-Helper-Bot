@@ -86,6 +86,32 @@ const getSpellsData = () => {
     }
 };
 
+// Function to load bullshitCounter from the JSON file
+let bullshitCounter = 0; // Default counter
+function loadBullshitCount() {
+    try {
+        const data = fs.readFileSync('./bullshit.json', 'utf8');
+        const jsonData = JSON.parse(data);
+        bullshitCounter = jsonData.bullshitCount || 0; // Set to 0 if the file is empty or undefined
+        console.log(`Bullshit counter loaded: ${bullshitCounter}`);
+    } catch (error) {
+        console.error('Error loading bullshit count:', error);
+        // If file does not exist or any error, we initialize with 0
+        bullshitCounter = 0;
+    }
+}
+
+// Function to save bullshitCounter to the JSON file
+function saveBullshitCount() {
+    const data = JSON.stringify({ bullshitCount: bullshitCounter }, null, 2); // Format the JSON with 2-space indentation
+    try {
+        fs.writeFileSync('./bullshit.json', data, 'utf8');
+        console.log('Bullshit counter saved to file.');
+    } catch (error) {
+        console.error('Error saving bullshit count:', error);
+    }
+}
+
 
 // Functions --------------------------------------
 
@@ -242,7 +268,8 @@ ${componentsText}
 });
 
 // Bullshit function ---------------------------------------
-let bullshitCounter = 0;
+// Load the current count when the bot starts
+loadBullshitCount();
 
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isCommand()) return;
@@ -252,9 +279,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (commandName === 'bullshit') {
         // Retrieve the number of bullshits from the command options
         const numberOfBullshits = options.getInteger('bullshit');
-
+        
         // Increment the counter
         bullshitCounter += numberOfBullshits;
+
+        // Save the updated counter to the JSON file
+        saveBullshitCount();
 
         // Reply to the interaction with the current count
         await interaction.reply(`Bullshits added: ${numberOfBullshits}. Total bullshits: ${bullshitCounter}.`);
