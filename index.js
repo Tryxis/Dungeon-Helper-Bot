@@ -1,20 +1,18 @@
 const { Client, Events, GatewayIntentBits, SlashCommandBuilder } = require("discord.js");
 const fs = require('fs');
-const { token, serverId } = require("./config.json");
+const { token } = require("./config.json");
 const { responses } = require("./roll-commands.js");
 const { conditions, rules } = require("./rules.js");
 const { commands } = require("./commands.js");
 
-
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 
-// Slash Builders
 client.once(Events.ClientReady, c => {
     console.log(`Logged in as ${c.user.tag}`);
 
     const ping = new SlashCommandBuilder()
-        .setName(`ping`)
-        .setDescription(`Replies with "Pong"`);
+        .setName('ping')
+        .setDescription('Replies with "Pong"');
 
     const conditionCommand = new SlashCommandBuilder()
         .setName('condition')
@@ -67,12 +65,12 @@ client.once(Events.ClientReady, c => {
                 .setDescription('Number of bullshits')
                 .setRequired(true));
 
-    client.application.commands.create(ping, serverId);
-    client.application.commands.create(conditionCommand, serverId);
-    client.application.commands.create(rulesCommand, serverId);
-    client.application.commands.create(spellCommand, serverId);
-    client.application.commands.create(bullshitCommand, serverId);
-
+    // Register the commands globally (no need for serverId)
+    client.application.commands.create(ping);
+    client.application.commands.create(conditionCommand);
+    client.application.commands.create(rulesCommand);
+    client.application.commands.create(spellCommand);
+    client.application.commands.create(bullshitCommand);
 });
 
 // Function to read the spells.json file
@@ -111,9 +109,6 @@ function saveBullshitCount() {
         console.error('Error saving bullshit count:', error);
     }
 }
-
-
-// Functions --------------------------------------
 
 // Ping function-----------------------------------
 client.on(Events.InteractionCreate, interaction => {
@@ -170,7 +165,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
             console.log(`Response Selected: ${response}`); // Log the response
         }
 
-        // Ensure response is included even if it's empty
         const replyMessage = `🎲 You rolled: ${results.join(', ')} on ${numberOfDice}d${sides}. Total roll: ${total}. ${response || ''}`;
         await interaction.reply(replyMessage);
     }
@@ -184,10 +178,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (commandName === 'condition') {
         const conditionName = options.getString('condition');
-        console.log(`Condition selected: ${conditionName}`); // Log the selected condition
+        console.log(`Condition selected: ${conditionName}`);
 
         const selectedCondition = conditions.options.find(c => c.name === conditionName);
-        console.log(`Selected Condition Object: ${JSON.stringify(selectedCondition)}`); // Log the found condition
+        console.log(`Selected Condition Object: ${JSON.stringify(selectedCondition)}`);
 
         if (selectedCondition) {
             await interaction.reply(`${selectedCondition.name}: ${selectedCondition.description}`);
@@ -205,10 +199,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (commandName === 'rules') {
         const ruleName = options.getString('rules');
-        console.log(`Condition selected: ${ruleName}`); // Log the selected condition
+        console.log(`Rule selected: ${ruleName}`);
 
         const selectedRule = rules.options.find(c => c.name === ruleName);
-        console.log(`Selected Rules Object: ${JSON.stringify(selectedRule)}`); // Log the found condition
+        console.log(`Selected Rules Object: ${JSON.stringify(selectedRule)}`);
 
         if (selectedRule) {
             await interaction.reply(`${selectedRule.name}: ${selectedRule.description}`);
@@ -226,7 +220,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (commandName === 'spell') {
         const spellName = options.getString('spell');
-        console.log(`Spell selected: ${spellName}`); // Log the selected spell name
+        console.log(`Spell selected: ${spellName}`);
 
         const spellsData = getSpellsData(); // Load the spells data from the file
         if (!spellsData) {
@@ -234,14 +228,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
             return;
         }
 
-        // Find the spell based on the name
         const selectedSpell = spellsData.find(spell => spell.name.toLowerCase() === spellName.toLowerCase());
 
         if (selectedSpell) {
             const { name, level, school, casting_time, range, duration, description, components } = selectedSpell;
             const componentsText = `Components: ${components.raw}`;
 
-            // Reply with the spell details
             await interaction.reply(`
 **${name}**
 *Level*: ${level}, *School*: ${school}
@@ -253,14 +245,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 ${componentsText}
             `);
         } else {
-            // If no exact match, search for spells that contain the input string
             const matchingSpells = spellsData.filter(spell => spell.name.toLowerCase().includes(spellName));
 
             if (matchingSpells.length > 0) {
                 const spellList = matchingSpells.map(spell => spell.name).join(', ');
                 await interaction.reply(`No exact match found for "${spellName}". Did you mean: ${spellList}?`);
             } else {
-                // If no matching spells at all, notify the user
                 await interaction.reply(`No spells found containing "${spellName}".`);
             }
         }
@@ -277,21 +267,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const { commandName, options } = interaction;
 
     if (commandName === 'bullshit') {
-        // Retrieve the number of bullshits from the command options
         const numberOfBullshits = options.getInteger('bullshit');
         
-        // Increment the counter
         bullshitCounter += numberOfBullshits;
-
-        // Save the updated counter to the JSON file
         saveBullshitCount();
 
-        // Reply to the interaction with the current count
         await interaction.reply(`Bullshits added: ${numberOfBullshits}. Total bullshits: ${bullshitCounter}.`);
     }
 });
-
-
-
 
 client.login(token);

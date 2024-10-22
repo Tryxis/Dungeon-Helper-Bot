@@ -35,8 +35,9 @@ const rest = new REST({ version: '10' }).setToken(token);
     try {
         console.log('Started refreshing application (/) commands.');
 
+        // Register global commands (no serverId required)
         await rest.put(
-            Routes.applicationGuildCommands(clientId, serverId),
+            Routes.applicationCommands(clientId),
             { body: commands }
         );
 

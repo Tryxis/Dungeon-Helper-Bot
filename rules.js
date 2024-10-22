@@ -1,7 +1,7 @@
 // Import necessary modules
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { clientId, serverId, token } = require('./config.json');
+const { clientId, token } = require('./config.json');
 const { commands } = require('./roll-commands');
 
 // Define the conditions and their descriptions
@@ -48,7 +48,7 @@ const rest = new REST({ version: '9' }).setToken(token);
 
         // Register the commands with Discord
         await rest.put(
-            Routes.applicationGuildCommands(clientId, serverId),
+            Routes.applicationGuildCommands(clientId),
             { body: commands,
             },
         );
