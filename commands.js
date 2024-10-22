@@ -15,6 +15,18 @@ const commands = [
             },
         ],
     },
+    {
+        name: 'bullshit',
+        description: 'Counts how many times Kieron has been ripped off',
+        options: [
+            {
+                name: 'bullshit',
+                type: 3, // STRING type for slash command option
+                description: 'Number of bullshits',
+                required: true,
+            },
+        ],
+    },
 ];
 
 const rest = new REST({ version: '10' }).setToken(token);

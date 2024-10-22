@@ -59,10 +59,19 @@ client.once(Events.ClientReady, c => {
                 .setDescription('The name of the spell')
                 .setRequired(true));
 
+    const bullshitCommand = new SlashCommandBuilder()
+        .setName('bullshit')
+        .setDescription('Counts how many times Kieron has been ripped off')
+        .addIntegerOption(option =>
+            option.setName('bullshit')
+                .setDescription('Number of bullshits')
+                .setRequired(true));
+
     client.application.commands.create(ping, serverId);
     client.application.commands.create(conditionCommand, serverId);
     client.application.commands.create(rulesCommand, serverId);
     client.application.commands.create(spellCommand, serverId);
+    client.application.commands.create(bullshitCommand, serverId);
 
 });
 
@@ -229,6 +238,26 @@ ${componentsText}
                 await interaction.reply(`No spells found containing "${spellName}".`);
             }
         }
+    }
+});
+
+// Bullshit function ---------------------------------------
+let bullshitCounter = 0;
+
+client.on(Events.InteractionCreate, async (interaction) => {
+    if (!interaction.isCommand()) return;
+
+    const { commandName, options } = interaction;
+
+    if (commandName === 'bullshit') {
+        // Retrieve the number of bullshits from the command options
+        const numberOfBullshits = options.getInteger('bullshit');
+
+        // Increment the counter
+        bullshitCounter += numberOfBullshits;
+
+        // Reply to the interaction with the current count
+        await interaction.reply(`Bullshits added: ${numberOfBullshits}. Total bullshits: ${bullshitCounter}.`);
     }
 });
 
