@@ -88,7 +88,7 @@ client.on(Events.InteractionCreate, interaction => {
     }
 });
 
-// Roll function -----------------------------------
+// Roll function -------------------------------------------
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isCommand()) return;
 
@@ -141,7 +141,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
-// Condition function -----------------------------------
+// Condition function --------------------------------------
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isCommand()) return;
 
@@ -162,7 +162,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
-// Rules function -----------------------------------
+// Rules function ------------------------------------------
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isCommand()) return;
 
@@ -183,7 +183,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
-// Spell lookup function for the 'spells' command
+// Spell function ------------------------------------------
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isCommand()) return;
 
@@ -218,7 +218,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
 ${componentsText}
             `);
         } else {
-            await interaction.reply("Spell not found.");
+            // If no exact match, search for spells that contain the input string
+            const matchingSpells = spellsData.filter(spell => spell.name.toLowerCase().includes(spellName));
+
+            if (matchingSpells.length > 0) {
+                const spellList = matchingSpells.map(spell => spell.name).join(', ');
+                await interaction.reply(`No exact match found for "${spellName}". Did you mean: ${spellList}?`);
+            } else {
+                // If no matching spells at all, notify the user
+                await interaction.reply(`No spells found containing "${spellName}".`);
+            }
         }
     }
 });
