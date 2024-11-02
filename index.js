@@ -99,6 +99,21 @@ function loadBullshitCount() {
     }
 }
 
+// Function to get roll response based on a single d20 roll result
+function getRollResponse(singleResult, responses) {
+    if (singleResult === 1) {
+        return responses.nat1Responses[Math.floor(Math.random() * responses.nat1Responses.length)].response;
+    } else if (singleResult === 20) {
+        return responses.nat20Responses[Math.floor(Math.random() * responses.nat20Responses.length)].response;
+    } else if (singleResult < 10) {
+        return responses.badResponses[Math.floor(Math.random() * responses.badResponses.length)].response;
+    } else if (singleResult < 15) {
+        return responses.okResponses[Math.floor(Math.random() * responses.okResponses.length)].response;
+    } else {
+        return responses.goodResponses[Math.floor(Math.random() * responses.goodResponses.length)].response;
+    }
+};
+
 // Function to save bullshitCounter to the JSON file
 function saveBullshitCount() {
     const data = JSON.stringify({ bullshitCount: bullshitCounter }, null, 2); // Format the JSON with 2-space indentation
@@ -109,6 +124,7 @@ function saveBullshitCount() {
         console.error('Error saving bullshit count:', error);
     }
 }
+
 
 // Ping function-----------------------------------
 client.on(Events.InteractionCreate, interaction => {
@@ -149,18 +165,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             const singleResult = results[0];
             console.log(`Single Result: ${singleResult}`); // Log single result
 
-            // Determine the response based on the result
-            if (singleResult === 1) {
-                response = responses.nat1Responses[Math.floor(Math.random() * responses.nat1Responses.length)].response;
-            } else if (singleResult === 20) {
-                response = responses.nat20Responses[Math.floor(Math.random() * responses.nat20Responses.length)].response;
-            } else if (singleResult < 10) {
-                response = responses.badResponses[Math.floor(Math.random() * responses.badResponses.length)].response;
-            } else if (singleResult < 15) {
-                response = responses.okResponses[Math.floor(Math.random() * responses.okResponses.length)].response;
-            } else {
-                response = responses.goodResponses[Math.floor(Math.random() * responses.goodResponses.length)].response;
-            }
+            response = getRollResponse(singleResult, responses);
 
             console.log(`Response Selected: ${response}`); // Log the response
         }

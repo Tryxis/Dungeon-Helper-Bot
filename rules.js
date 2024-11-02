@@ -48,7 +48,7 @@ const rest = new REST({ version: '9' }).setToken(token);
 
         // Register the commands with Discord
         await rest.put(
-            Routes.applicationGuildCommands(clientId),
+            Routes.applicationCommands(clientId),
             { body: commands,
             },
         );
