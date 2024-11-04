@@ -4,6 +4,7 @@ const { token } = require("./config.json");
 const { responses } = require("./roll-commands.js");
 const { conditions, rules } = require("./rules.js");
 const { commands } = require("./commands.js");
+const commandFunctions = require("./commandFunctions.js");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 
@@ -73,16 +74,16 @@ client.once(Events.ClientReady, c => {
     client.application.commands.create(bullshitCommand);
 });
 
-// Function to read the spells.json file
-const getSpellsData = () => {
-    try {
-        const data = fs.readFileSync('spells.json', 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        console.error('Error reading spells.json file:', err);
-        return null;
-    }
-};
+// // Function to read the spells.json file
+// const commandFunctions. = () => {
+//     try {
+//         const data = fs.readFileSync('spells.json', 'utf8');
+//         return JSON.parse(data);
+//     } catch (err) {
+//         console.error('Error reading spells.json file:', err);
+//         return null;
+//     }
+// };
 
 // Function to load bullshitCounter from the JSON file
 let bullshitCounter = 0; // Default counter
@@ -227,7 +228,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const spellName = options.getString('spell');
         console.log(`Spell selected: ${spellName}`);
 
-        const spellsData = getSpellsData(); // Load the spells data from the file
+            
+        const spellsData = commandFunctions.getSpellsData(); // Load the spells data from the file
         if (!spellsData) {
             await interaction.reply("Error loading spells data.");
             return;
