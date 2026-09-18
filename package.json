@@ -1,17 +1,37 @@
 {
-  "name": "discord-bot",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "dungeon-helper-bot",
+  "version": "2.0.0",
+  "description": "A Discord bot that helps you run D&D 5e games: dice, spells, conditions, rules and an initiative tracker.",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.17.0"
   },
-  "keywords": [],
-  "author": "",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "deploy": "node src/deploy-commands.js",
+    "deploy:guild": "node src/deploy-commands.js --guild",
+    "deploy:clear": "node src/deploy-commands.js --clear",
+    "test": "node --test test/*.test.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "dnd",
+    "dnd5e",
+    "ttrpg",
+    "dice"
+  ],
+  "author": "Tryxis",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@discordjs/rest": "^2.4.0",
-    "discord-api-types": "^0.37.102",
-    "discord.js": "^14.16.3"
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.13.0"
   }
 }
